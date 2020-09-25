@@ -1,6 +1,6 @@
 NAME
 ====
-Pakku::RecMan::Client - Pakku RecMan Client
+`Pakku::RecMan::Client` - Pakku RecMan Client
 
 SYNOPSIS
 ========
@@ -26,6 +26,16 @@ recman-client.raku JSON::Fast recman.pakku.org
 DESCRIPTION
 ===========
 `Pakku::RecMan::Client` queries a  list of `Pakku::RecMan`s and returns the first answer.
+
+INSTALLATION
+===========
+```
+pakku add Pakku::RecMan::Client
+
+# or 
+
+zef install Pakku::RecMan::Client
+```
 
 AUTHOR
 ======
