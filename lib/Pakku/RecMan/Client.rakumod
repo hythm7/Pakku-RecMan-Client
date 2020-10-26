@@ -1,3 +1,4 @@
+use Retry;
 use LibCurl::HTTP :subs;
 
 use Pakku::Spec;
@@ -25,7 +26,7 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
 
   my $meta;
  
-  @!url.map( -> $url { last if $meta = jget $url ~ $query } );
+  @!url.map( -> $url { last if $meta = retry { jget $url ~ $query } } );
 
   return Empty unless $meta;
 
@@ -41,6 +42,6 @@ multi method list ( ::?CLASS:D: :@spec where *.so ) {
 
 multi method list ( ::?CLASS:D: :@spec where not *.so ) {
 
-  flat @!url.map( -> $url { jget "$url/42"  } );
+  flat @!url.map( -> $url { retry { jget "$url/42" } } );
 
 }
