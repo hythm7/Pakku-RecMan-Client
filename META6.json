@@ -6,7 +6,8 @@
   "build-depends" : [ ],
   "depends" : [
     "LibCurl",
-    "Pakku::Spec:ver<pupa>:auth<github:hythm7>"
+    "Retry",
+    "Pakku::Spec"
   ],
   "description" : "Pakku RecMan Client",
   "license" : "Artistic-2.0",
@@ -28,5 +29,5 @@
     "recommendation"
   ],
   "test-depends" : [ ],
-  "version" : "pupa"
+  "version" : "0.0.1"
 }
