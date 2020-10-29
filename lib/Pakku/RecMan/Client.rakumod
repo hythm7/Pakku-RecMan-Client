@@ -1,5 +1,5 @@
 use Retry;
-use LibCurl::HTTP :subs;
+use LibCurl::Easy;
 
 use Pakku::Spec;
 
@@ -7,10 +7,13 @@ use Pakku::Spec;
 unit class Pakku::RecMan::Client;
 
 has @!url;
+has $!curl;
 
 submethod BUILD ( :@url! ) {
 
-  @!url = @url.map( -> $url { $url ~ '/meta'} );
+  @!url  = @url.map( -> $url { $url ~ '/meta'} );
+
+  $!curl = LibCurl::Easy.new;
 
 }
 
@@ -26,7 +29,13 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
 
   my $meta;
  
-  @!url.map( -> $url { last if $meta = retry { jget $url ~ $query } } );
+  @!url.map( -> $url {
+
+    $!curl.setopt: URL => $url ~ $query;
+
+    last if $meta = try retry { $!curl.perform.content };
+
+  } );
 
   return Empty unless $meta;
 
@@ -42,6 +51,10 @@ multi method list ( ::?CLASS:D: :@spec where *.so ) {
 
 multi method list ( ::?CLASS:D: :@spec where not *.so ) {
 
-  flat @!url.map( -> $url { retry { jget "$url/42" } } );
+
+  @!url.map( -> $url {
+    $!curl.setopt: URL => "$url/42";
+    | try retry { Rakudo::Internals::JSON.from-json: $!curl.perform.content }
+  } ).grep( *.defined );
 
 }
