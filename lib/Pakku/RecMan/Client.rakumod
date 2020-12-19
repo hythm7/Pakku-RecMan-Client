@@ -6,14 +6,16 @@ use Pakku::Spec;
 
 unit class Pakku::RecMan::Client;
 
-has @!url;
 has $!curl;
 
-submethod BUILD ( :@url! ) {
+has @.url;
 
-  @!url  = @url.map( -> $url { $url ~ '/meta'} );
+
+submethod BUILD ( :@url ) {
 
   $!curl = LibCurl::Easy.new;
+
+  @!url  = @url.map( -> $url { $url ~ '/meta'} );
 
 }
 
@@ -23,9 +25,9 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
   my $query;
 
   $query ~= '?name=' ~ $spec.name;
-  $query ~= '&ver='  ~ $spec.ver   if $spec.ver;
-  $query ~= '&auth=' ~ $spec.auth  if $spec.auth;
-  $query ~= '&api='  ~ $spec.api   if $spec.api;
+  $query ~= '&ver='  ~ $_                          with $spec.ver;
+  $query ~= '&auth=' ~ $_.trans: [' '] => ['%20']  with $spec.auth;
+  $query ~= '&api='  ~ $_                          with $spec.api;
 
   my $meta;
  
@@ -41,6 +43,18 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
 
   $meta;
   
+}
+
+method fetch ( Str:D :$URL!, Str:D :$download! ) {
+
+  retry {
+
+    $!curl.setopt: URL => ~$URL, :$download;
+
+    $!curl.perform;
+
+  }
+
 }
 
 multi method list ( ::?CLASS:D: :@spec where *.so ) {
