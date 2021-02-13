@@ -1,4 +1,5 @@
 use Retry;
+use URI::Encode;
 use LibCurl::Easy;
 
 use Pakku::Spec;
@@ -25,9 +26,11 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
   my $query;
 
   $query ~= '?name=' ~ $spec.name;
-  $query ~= '&ver='  ~ $_                          with $spec.ver;
-  $query ~= '&auth=' ~ $_.trans: [' '] => ['%20']  with $spec.auth;
-  $query ~= '&api='  ~ $_                          with $spec.api;
+  $query ~= '&ver='  ~ $_  with $spec.ver;
+  $query ~= '&auth=' ~ $_  with $spec.auth;
+  $query ~= '&api='  ~ $_  with $spec.api;
+
+  $query = uri_encode $query;
 
   my $meta;
  

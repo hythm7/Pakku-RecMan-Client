@@ -6,6 +6,7 @@
   "build-depends" : [ ],
   "depends" : [
     "LibCurl",
+    "URI::Encode",
     "Retry",
     "Pakku::Spec"
   ],
