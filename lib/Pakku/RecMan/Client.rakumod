@@ -52,7 +52,7 @@ method fetch ( Str:D :$URL!, Str:D :$download! ) {
 
   retry {
 
-    $!curl.setopt: URL => ~$URL, :$download;
+    $!curl.setopt: URL => ~$URL, :$download, :followlocation;
 
     $!curl.perform;
 
