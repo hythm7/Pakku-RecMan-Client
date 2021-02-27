@@ -7,28 +7,21 @@ use Pakku::Spec;
 
 unit class Pakku::RecMan::Client;
 
-has $!curl;
+has $!curl = LibCurl::Easy.new;
 
 has @.url;
 
+submethod TWEAK ( ) { @!url .= map( -> $url { $url ~ '/recommend' } ) }
 
-submethod BUILD ( :@url ) {
-
-  $!curl = LibCurl::Easy.new;
-
-  @!url  = @url.map( -> $url { $url ~ '/meta'} );
-
-}
-
-
-method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
+method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec!, :$count ) {
 
   my $query;
 
-  $query ~= '?name=' ~ $spec.name;
-  $query ~= '&ver='  ~ $_  with $spec.ver;
-  $query ~= '&auth=' ~ $_  with $spec.auth;
-  $query ~= '&api='  ~ $_  with $spec.api;
+  $query ~= '?name='  ~ $spec.name;
+  $query ~= '&ver='   ~ $_  with $spec.ver;
+  $query ~= '&auth='  ~ $_  with $spec.auth;
+  $query ~= '&api='   ~ $_  with $spec.api;
+  $query ~= '&count=' ~ $_  with $count;
 
   $query = uri_encode $query;
 
@@ -38,7 +31,7 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec! ) {
 
     $!curl.setopt: URL => $url ~ $query;
 
-    last if $meta = try retry { $!curl.perform.content };
+    last if $meta = try retry { Rakudo::Internals::JSON.from-json: $!curl.perform.content };
 
   } );
 
@@ -57,21 +50,5 @@ method fetch ( Str:D :$URL!, Str:D :$download! ) {
     $!curl.perform;
 
   }
-
-}
-
-multi method list ( ::?CLASS:D: :@spec where *.so ) {
-
-  @spec.map( -> $spec { self.recommend: :$spec } );
-
-}
-
-multi method list ( ::?CLASS:D: :@spec where not *.so ) {
-
-
-  @!url.map( -> $url {
-    $!curl.setopt: URL => "$url/42";
-    | try retry { Rakudo::Internals::JSON.from-json: $!curl.perform.content }
-  } ).grep( *.defined );
 
 }

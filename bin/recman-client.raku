@@ -2,18 +2,12 @@
 
 use Pakku::RecMan::Client;
 
-multi MAIN ( Str:D  $spec, *@url ) {
+unit sub MAIN ( Str:D  :$spec!, :$count, *@url ) {
 
   my $recman = Pakku::RecMan::Client.new: :@url;
 
-  my $meta = $recman.recommend: spec => Pakku::Spec.new: $spec;
+  my $meta = $recman.recommend: :$count, spec => Pakku::Spec.new: $spec;
 
   say $meta if $meta;
-
-}
-
-multi MAIN ( 'list-all', *@url ) {
-
-  Pakku::RecMan::Client.new( :@url ).list.map( *.say );
 
 }
