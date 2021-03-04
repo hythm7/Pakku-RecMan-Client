@@ -29,13 +29,13 @@ method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec!, :$count ) {
 
     $!curl.setopt: URL => $url ~ $query;
 
-    last if $meta = try retry { Rakudo::Internals::JSON.from-json: $!curl.perform.content };
+    last if $meta = try retry { $!curl.perform.content };
 
   } );
 
   return Empty unless $meta;
 
-  $meta;
+  Rakudo::Internals::JSON.from-json: $meta;
   
 }
 
@@ -57,13 +57,13 @@ method search ( ::?CLASS:D: Pakku::Spec:D :$spec!, :$count = ∞ ) {
 
     $!curl.setopt: URL => $url ~ $query;
 
-    last if $meta = try retry { Rakudo::Internals::JSON.from-json: $!curl.perform.content };
+    last if $meta = try retry { $!curl.perform.content };
 
   } );
 
   return Empty unless $meta;
 
-  $meta;
+  Rakudo::Internals::JSON.from-json: $meta;
   
 }
 
