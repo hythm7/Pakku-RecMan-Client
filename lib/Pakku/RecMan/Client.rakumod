@@ -9,7 +9,7 @@ unit class Pakku::RecMan::Client;
 
 has $!curl = LibCurl::Easy.new;
 
-has @!url is built;
+has @!url is required is built;
 
 method recommend ( ::?CLASS:D: Pakku::Spec:D :$spec!, :$count ) {
 
@@ -68,11 +68,11 @@ method search ( ::?CLASS:D: Pakku::Spec:D :$spec!, :$count = ∞ ) {
 }
 
 
-method fetch ( Str:D :$URL!, Str:D :$download! ) {
+method fetch ( Str:D :url( :$URL )!, Str:D :$download! ) {
 
   retry {
 
-    $!curl.setopt: URL => ~$URL, :$download, :followlocation;
+    $!curl.setopt: :$URL :$download :followlocation;
 
     $!curl.perform;
 
